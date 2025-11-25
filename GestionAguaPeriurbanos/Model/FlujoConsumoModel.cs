@@ -1,26 +1,36 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace GestionAguaPeriurbanos.Model
 {
+    // Flujo de salida: consumo del barrio.
     public class FlujoConsumoModel
     {
-        // Daily consumption rates (index 0 = day 1). If the requested day is beyond the array,
-        // the last value is reused.
-        private readonly double[] _dailyRates;
+        // Consumo normal sin retroalimentación
+        public decimal ConsumoBase { get; set; }
 
-        public FlujoConsumoModel(IEnumerable<double> dailyRates)
+        // Incremento del consumo cuando hay acaparamiento (bucle reforzador)
+        public decimal IncrementoPorAcaparamientoPct { get; set; }
+
+        // Reducción del consumo cuando hay racionamiento (bucle balanceador)
+        public decimal ReduccionPorRacionamientoPct { get; set; }
+
+        // Consumo modificado por acaparamiento si el nivel es bajo
+        public decimal AplicarReforzador(decimal consumo, decimal nivel, decimal capacidad, decimal umbralPct)
         {
-            if (dailyRates == null) throw new ArgumentNullException(nameof(dailyRates));
-            _dailyRates = new List<double>(dailyRates).ToArray();
-            if (_dailyRates.Length == 0) throw new ArgumentException("dailyRates must contain at least one value");
+            if (nivel <= capacidad * (umbralPct / 100m))
+                return consumo * (1m + IncrementoPorAcaparamientoPct / 100m);
+
+            return consumo;
         }
 
-        public double GetForDay(int day)
+        // Consumo modificado por racionamiento si el nivel es crítico
+        public decimal AplicarBalanceador(decimal consumo, decimal nivel, decimal capacidad, decimal umbralPct)
         {
-            if (day < 1) throw new ArgumentOutOfRangeException(nameof(day));
-            int index = Math.Min(day - 1, _dailyRates.Length - 1);
-            return _dailyRates[index];
+            if (nivel <= capacidad * (umbralPct / 100m))
+                return consumo * (1m - ReduccionPorRacionamientoPct / 100m);
+
+            return consumo;
         }
     }
 }

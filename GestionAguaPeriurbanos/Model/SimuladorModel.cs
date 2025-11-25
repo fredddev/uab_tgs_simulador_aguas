@@ -3,49 +3,70 @@ using System.Collections.Generic;
 
 namespace GestionAguaPeriurbanos.Model
 {
+    // Motor dinámico del sistema: combina stocks, flujos y retroalimentaciones.
     public class SimuladorModel
     {
-        public TanqueModel Tanque { get; }
-        public FlujoEntradaModel Entrada { get; }
-        public FlujoConsumoModel Consumo { get; }
-        public ReglasFeedbackModel Reglas { get; }
+        // STOCK
+        public TanqueModel Tanque { get; set; }
 
-        public SimuladorModel(TanqueModel tanque, FlujoEntradaModel entrada, FlujoConsumoModel consumo, ReglasFeedbackModel reglas = null)
+        // FLUJOS
+        public FlujoEntradaModel Entrada { get; set; }
+        public FlujoConsumoModel Consumo { get; set; }
+
+        // Activación de bucles sistémicos
+        public bool ReforzadorActivo { get; set; }
+        public bool BalanceadorActivo { get; set; }
+
+        // Umbrales
+        public decimal UmbralReforzadorPct { get; set; }
+        public decimal UmbralBalanceadorPct { get; set; }
+
+        // Simulación principal
+        public List<ResultadoDia> Simular(int dias)
         {
-            Tanque = tanque ?? throw new ArgumentNullException(nameof(tanque));
-            Entrada = entrada ?? throw new ArgumentNullException(nameof(entrada));
-            Consumo = consumo ?? throw new ArgumentNullException(nameof(consumo));
-            Reglas = reglas ?? new ReglasFeedbackModel();
-        }
+            var resultados = new List<ResultadoDia>();
 
-        public List<ResultadoDia> Run(int days)
-        {
-            if (days < 1) throw new ArgumentOutOfRangeException(nameof(days));
-            var results = new List<ResultadoDia>(days);
-
-            for (int d = 1; d <= days; d++)
+            for (int dia = 1; dia <= dias; dia++)
             {
-                double start = Tanque.Volume;
-                double baseInflow = Entrada.GetForDay(d);
-                double inflow = Reglas.AdjustInflow(baseInflow, Tanque);
-                double overflow = Tanque.AddVolume(inflow);
-                double consumption = Consumo.GetForDay(d);
-                double shortage = Tanque.RemoveVolume(consumption);
-                double end = Tanque.Volume;
+                var res = new ResultadoDia();
+                res.Dia = dia;
+                res.NivelInicial = Tanque.Nivel;
 
-                results.Add(new ResultadoDia
+                // --- 1. FLUJO DE ENTRADA ---
+                res.EntradaLitros = Entrada.CalcularEntrada(dia);
+                Tanque.Agregar(res.EntradaLitros);
+
+                // --- 2. CALCULAR CONSUMO ---
+                decimal consumo = Consumo.ConsumoBase;
+
+                // Bucle reforzador (acaparamiento)
+                if (ReforzadorActivo)
                 {
-                    Day = d,
-                    StartVolume = start,
-                    Inflow = inflow,
-                    Consumption = consumption,
-                    EndVolume = end,
-                    Overflow = overflow,
-                    Shortage = shortage
-                });
+                    decimal previo = consumo;
+                    consumo = Consumo.AplicarReforzador(consumo, Tanque.Nivel, Tanque.Capacidad, UmbralReforzadorPct);
+                    res.ReforzadorAplicado = consumo != previo;
+                }
+
+                // Bucle balanceador (racionamiento)
+                if (BalanceadorActivo)
+                {
+                    decimal previo = consumo;
+                    consumo = Consumo.AplicarBalanceador(consumo, Tanque.Nivel, Tanque.Capacidad, UmbralBalanceadorPct);
+                    res.BalanceadorAplicado = consumo != previo;
+                }
+
+                res.ConsumoLitros = consumo;
+
+                // --- 3. APLICAR SALIDA ---
+                Tanque.Consumir(consumo);
+
+                // --- 4. NIVEL FINAL ---
+                res.NivelFinal = Tanque.Nivel;
+
+                resultados.Add(res);
             }
 
-            return results;
+            return resultados;
         }
     }
 }

@@ -2,50 +2,38 @@ using System;
 
 namespace GestionAguaPeriurbanos.Model
 {
+    // Representa el depósito principal del sistema: el tanque de agua.
     public class TanqueModel
     {
-        public double Capacity { get; }
-        public double Volume { get; private set; }
+        // Capacidad máxima física del tanque (no cambia durante la simulación)
+        public decimal Capacidad { get; }
 
-        public TanqueModel(double capacity, double initialVolume = 0)
+        // Nivel actual de agua dentro del tanque
+        public decimal Nivel { get; private set; }
+
+        // Constructor: define la capacidad y el nivel inicial
+        public TanqueModel(decimal capacidad, decimal nivelInicial)
         {
-            if (capacity <= 0) throw new ArgumentOutOfRangeException(nameof(capacity));
-            Capacity = capacity;
-            Volume = Math.Clamp(initialVolume, 0, capacity);
+            Capacidad = capacidad;      // Límite superior del stock
+            Nivel = nivelInicial;       // Estado inicial del sistema
         }
 
-        // Adds volume and returns overflow amount (0 if none)
-        public double AddVolume(double amount)
+        // Aplica el flujo de entrada (lleno por cisterna)
+        public void Agregar(decimal litros)
         {
-            if (amount <= 0) return 0;
-            double available = Capacity - Volume;
-            if (amount <= available)
-            {
-                Volume += amount;
-                return 0;
-            }
-            Volume = Capacity;
-            return amount - available;
+            Nivel += litros;            // Se suma agua al stock
+
+            if (Nivel > Capacidad)
+                Nivel = Capacidad;      // No puede superar el límite físico
         }
 
-        // Removes volume and returns shortage amount (0 if none)
-        public double RemoveVolume(double amount)
+        // Aplica el flujo de salida (consumo del barrio)
+        public void Consumir(decimal litros)
         {
-            if (amount <= 0) return 0;
-            if (amount <= Volume)
-            {
-                Volume -= amount;
-                return 0;
-            }
-            double shortage = amount - Volume;
-            Volume = 0;
-            return shortage;
-        }
+            Nivel -= litros;            // Se reduce el stock
 
-        public double GetFillPercentage()
-        {
-            if (Capacity == 0) return 0;
-            return (Volume / Capacity) * 100.0;
+            if (Nivel < 0)
+                Nivel = 0;              // El stock nunca puede ser negativo
         }
     }
 }
