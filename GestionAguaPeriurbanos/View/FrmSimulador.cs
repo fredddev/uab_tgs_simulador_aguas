@@ -242,5 +242,10 @@ namespace GestionAguaPeriurbanos.View
         {
             presenter.ExportarInputs();
         }
+
+        private void label1_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
