@@ -1,0 +1,128 @@
+## =========
+## VISUAL STUDIO
+## =========
+.vs/
+*.user
+*.suo
+*.userosscache
+*.userprefs
+*.pidb
+*.svclog
+*.psess
+*.vsp
+*.vspx
+*_i.c
+*_p.c
+*_h.h
+*.dbmdl
+*.jfm
+*.tlog
+
+## =========
+## BUILD RESULTS
+## =========
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+Generated\ Files/
+
+## =========
+## .NET
+## =========
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.nuget.props
+*.nuget.targets
+*.snk
+*.pfx
+
+## =========
+## NUGET
+## =========
+packages/
+*.nupkg
+# Descargar packages automáticamente
+*.nuget\*
+
+## =========
+## WINDOWS FORMS ARCHIVOS
+## =========
+# Diseñadores
+*.Designer.cs
+*.resx
+*_Form.cs
+*.cachefile
+
+# Publicaciones ClickOnce
+publish/
+*.application
+*.manifest
+*.deploy
+
+## =========
+## CONFIG URGENTES
+## =========
+# NO subir configuraciones locales
+appsettings.Development.json
+appsettings.Local.json
+
+## =========
+## AZURE – AWS – DOCKER
+## =========
+# Docker
+Dockerfile.*
+docker-compose*.yml
+.docker/
+
+# Cloud settings
+*.aws*
+*.azure*
+
+## =========
+## RIDER / RESHARPER
+## =========
+.idea/
+*.DotSettings.user
+_ReSharper*/
+*.[Rr]e[Ss]harper
+
+## =========
+## TEST RESULTS
+## =========
+TestResult*/
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+## =========
+## TEMPORAL FILES
+## =========
+*.tmp
+*.temp
+*.bak
+*.log
+*.old
+*.orig
+*.cache
+*.sqlite
+*.db
+
+## =========
+## FILES FRECUENTES DE WINDOWS
+## =========
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+## =========
+## NODE / ANGULAR (si usas un frontend dentro de la solución)
+## =========
+node_modules/
+dist/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
