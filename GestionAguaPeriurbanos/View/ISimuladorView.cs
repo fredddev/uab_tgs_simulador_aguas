@@ -73,6 +73,9 @@ namespace GestionAguaPeriurbanos.View
             void MostrarMensaje(string mensaje);
             // Canal genérico de comunicación para errores o avisos.
             // Mantiene al Presenter libre de MessageBox (para no mezclar capas).
-        }
+
+            EscenarioInputDto ObtenerInputs();
+            void CargarInputs(EscenarioInputDto inputs);
+    }
     
 }

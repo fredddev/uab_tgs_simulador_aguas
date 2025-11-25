@@ -42,7 +42,7 @@ namespace GestionAguaPeriurbanos.View
 
         public decimal IncrementoConsumoPorAcaparamientoPct => numericIncrementoAcaparamiento.Value;
         public decimal ReduccionConsumoPorRacionamientoPct => numericReduccionRacionamiento.Value;
-               
+
 
         public void MostrarMensaje(string mensaje)
         {
@@ -193,6 +193,54 @@ namespace GestionAguaPeriurbanos.View
 
             // Título
             chartNivelTanque.Titles.Add("Nivel del Tanque vs Tiempo (con eventos sistémicos)");
+        }
+
+        public EscenarioInputDto ObtenerInputs()
+        {
+            return new EscenarioInputDto
+            {
+                NivelInicial = NivelInicial,
+                CapacidadTanque = CapacidadTanque,
+                ConsumoBase = ConsumoBase,
+                FrecuenciaCisterna = FrecuenciaCisterna,
+                VolumenCisterna = VolumenCisterna,
+                DuracionDias = DuracionDias,
+                ReforzadorActivo = ReforzadorActivo,
+                BalanceadorActivo = BalanceadorActivo,
+                UmbralReforzadorPct = UmbralReforzadorPct,
+                UmbralBalanceadorPct = UmbralBalanceadorPct,
+                IncrementoConsumoPorAcaparamientoPct = IncrementoConsumoPorAcaparamientoPct,
+                ReduccionConsumoPorRacionamientoPct = ReduccionConsumoPorRacionamientoPct
+            };
+        }
+
+        public void CargarInputs(EscenarioInputDto inputs)
+        {
+            numericNivelInicial.Value = inputs.NivelInicial;
+            numericCapacidad.Value = inputs.CapacidadTanque;
+            numericConsumoBase.Value = inputs.ConsumoBase;
+            numericFrecuencia.Value = inputs.FrecuenciaCisterna;
+            numericVolumenCisterna.Value = inputs.VolumenCisterna;
+            numericDuracionDias.Value = inputs.DuracionDias;
+
+            chkReforzador.Checked = inputs.ReforzadorActivo;
+            chkBalanceador.Checked = inputs.BalanceadorActivo;
+
+            numericUmbralReforzadorPct.Value = inputs.UmbralReforzadorPct;
+            numericUmbralBalanceadorPct.Value = inputs.UmbralBalanceadorPct;
+
+            numericIncrementoAcaparamiento.Value = inputs.IncrementoConsumoPorAcaparamientoPct;
+            numericReduccionRacionamiento.Value = inputs.ReduccionConsumoPorRacionamientoPct;
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            presenter.ImportarInputs();
+        }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            presenter.ExportarInputs();
         }
     }
 }

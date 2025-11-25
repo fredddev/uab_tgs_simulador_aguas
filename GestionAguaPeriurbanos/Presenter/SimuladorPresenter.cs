@@ -1,7 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using GestionAguaPeriurbanos.Model;
+﻿using GestionAguaPeriurbanos.Model;
 using GestionAguaPeriurbanos.View;
+using System;
+using System.Collections.Generic;
+using System.Text.Json;
 
 namespace GestionAguaPeriurbanos.Presenter
 {
@@ -105,6 +106,61 @@ namespace GestionAguaPeriurbanos.Presenter
                 view.MostrarMensaje("Error en la simulación: " + ex.Message);
             }
         }
+
+        public void ExportarInputs()
+        {
+            try
+            {
+                var inputs = view.ObtenerInputs();
+
+                using var sfd = new SaveFileDialog
+                {
+                    Filter = "Archivo JSON (*.json)|*.json",
+                    Title = "Exportar Inputs del Simulador",
+                    FileName = "escenario.json"
+                };
+
+                if (sfd.ShowDialog() == DialogResult.OK)
+                {
+                    var json = JsonSerializer.Serialize(inputs, new JsonSerializerOptions { WriteIndented = true });
+                    File.WriteAllText(sfd.FileName, json);
+                    view.MostrarMensaje("Inputs exportados correctamente.");
+                }
+            }
+            catch (Exception ex)
+            {
+                view.MostrarMensaje("Error al exportar: " + ex.Message);
+            }
+        }
+
+        public void ImportarInputs()
+        {
+            try
+            {
+                using var ofd = new OpenFileDialog
+                {
+                    Filter = "Archivo JSON (*.json)|*.json",
+                    Title = "Importar Inputs del Simulador"
+                };
+
+                if (ofd.ShowDialog() == DialogResult.OK)
+                {
+                    var json = File.ReadAllText(ofd.FileName);
+                    var inputs = JsonSerializer.Deserialize<EscenarioInputDto>(json);
+
+                    if (inputs == null)
+                        throw new Exception("Archivo inválido o vacío.");
+
+                    view.CargarInputs(inputs);
+                    view.MostrarMensaje("Inputs importados correctamente.");
+                }
+            }
+            catch (Exception ex)
+            {
+                view.MostrarMensaje("Error al importar: " + ex.Message);
+            }
+        }
+
     }
 
 }
